@@ -68,6 +68,7 @@ public class DebugEnricher extends BaseEnricher {
     @Override
     public void create(PlatformMode platformMode, KubernetesListBuilder builder) {
         if (isDebugEnabled()) {
+            getContext().getSummaryService().addToEnrichers(getName());
             int count = 0;
             List<HasMetadata> items = builder.buildItems();
             if (items != null) {

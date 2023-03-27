@@ -117,6 +117,7 @@ public class DefaultControllerEnricher extends BaseEnricher {
           .getHandlerFor(fromType(getConfig(Config.TYPE)));
       final HasMetadata resource = ch.get(controllerResourceConfig, images);
       log.info("Adding a default %s", resource.getKind());
+      getContext().getSummaryService().addToEnrichers(getName());
       builder.addToItems(resource);
       setProcessingInstruction(FABRIC8_GENERATED_CONTAINERS,
           getContainersFromPodSpec(ch.getPodTemplateSpec(controllerResourceConfig, images)));

@@ -70,6 +70,7 @@ public class DefaultMetadataEnricher extends BaseEnricher {
     }
 
     private void visit(KubernetesListBuilder builder, MetadataVisitor<?>[] visitors) {
+        getContext().getSummaryService().addToEnrichers(getName());
         for (MetadataVisitor<?> visitor : visitors) {
             builder.accept(visitor);
         }

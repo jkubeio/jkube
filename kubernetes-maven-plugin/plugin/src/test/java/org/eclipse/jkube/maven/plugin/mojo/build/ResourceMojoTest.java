@@ -13,6 +13,7 @@
  */
 package org.eclipse.jkube.maven.plugin.mojo.build;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -72,10 +73,12 @@ class ResourceMojoTest {
     ImageConfigResolver mockedImageConfigResolver = mock(ImageConfigResolver.class, RETURNS_DEEP_STUBS);
     Properties properties = new Properties();
     MavenProject mockedMavenProject = mock(MavenProject.class, RETURNS_DEEP_STUBS);
+    MavenSession mockedMavenSession = mock(MavenSession.class);
     mockedResourceService = mock(ResourceService.class, RETURNS_DEEP_STUBS);
     MojoExecution mockedMojoExecution = mock(MojoExecution.class, RETURNS_DEEP_STUBS);
     MojoDescriptor mockedMojoDescriptor = mock(MojoDescriptor.class, RETURNS_DEEP_STUBS);
     when(mockedMojoExecution.getMojoDescriptor()).thenReturn(mockedMojoDescriptor);
+    when(mockedMojoExecution.getGoal()).thenReturn("k8s:resource");
     when(mockedMojoDescriptor.getFullGoalName()).thenReturn("k8s:resource");
     defaultEnricherManagerMockedConstruction = mockConstruction(DefaultEnricherManager.class);
     JavaProject javaProject = JavaProject.builder()
@@ -99,6 +102,7 @@ class ResourceMojoTest {
     this.resourceMojo.images = Collections.singletonList(imageConfiguration);
     this.resourceMojo.project = mockedMavenProject;
     this.resourceMojo.settings = mock(Settings.class, RETURNS_DEEP_STUBS);
+    this.resourceMojo.session = mockedMavenSession;
     this.resourceMojo.jkubeServiceHub = mockedJKubeServiceHub;
     this.resourceMojo.log = mock(KitLogger.class, RETURNS_DEEP_STUBS);
     this.resourceMojo.skipResourceValidation = true;
@@ -110,6 +114,7 @@ class ResourceMojoTest {
     resourceMojo.mojoExecution = mockedMojoExecution;
 
     when(mockedMavenProject.getProperties()).thenReturn(properties);
+    when(mockedMavenSession.getGoals()).thenReturn(Collections.singletonList("k8s:resource"));
     when(mockedJKubeServiceHub.getConfiguration().getProject()).thenReturn(javaProject);
     when(mockedJKubeServiceHub.getConfiguration().getBasedir()).thenReturn(temporaryFolder.toFile());
     when(mockedJKubeServiceHub.getResourceService()).thenReturn(mockedResourceService);
@@ -137,7 +142,7 @@ class ResourceMojoTest {
         .isEqualTo("jkube/test-project");
     verify(mockedJKubeServiceHub, times(2)).getResourceService();
     verify(mockedResourceService, times(1)).generateResources(eq(PlatformMode.kubernetes), any(), any());
-    verify(mockedResourceService, times(1)).writeResources(any(), eq(ResourceClassifier.KUBERNETES), any());
+    verify(mockedResourceService, times(1)).writeResources(any(), eq(ResourceClassifier.KUBERNETES), any(), any());
   }
 
   @Test
@@ -152,7 +157,7 @@ class ResourceMojoTest {
     assertThat(defaultEnricherManagerMockedConstruction.constructed()).isEmpty();
     verify(mockedJKubeServiceHub, times(0)).getResourceService();
     verify(mockedResourceService, times(0)).generateResources(any(), any(), any());
-    verify(mockedResourceService, times(0)).writeResources(any(), any(), any());
+    verify(mockedResourceService, times(0)).writeResources(any(), any(), any(), any());
   }
 
   @Test
@@ -167,7 +172,7 @@ class ResourceMojoTest {
     assertThat(defaultEnricherManagerMockedConstruction.constructed()).isEmpty();
     verify(mockedJKubeServiceHub, times(0)).getResourceService();
     verify(mockedResourceService, times(0)).generateResources(any(), any(), any());
-    verify(mockedResourceService, times(0)).writeResources(any(), any(), any());
+    verify(mockedResourceService, times(0)).writeResources(any(), any(), any(), any());
   }
 
   @Test
@@ -182,7 +187,7 @@ class ResourceMojoTest {
       assertThat(resourceValidatorMockedConstruction.constructed()).hasSize(1);
       ResourceValidator mockResourceValidator = resourceValidatorMockedConstruction.constructed().get(0);
       InOrder inOrder = inOrder(mockedResourceService, mockResourceValidator);
-      inOrder.verify(mockedResourceService).writeResources(any(), any(), any());
+      inOrder.verify(mockedResourceService).writeResources(any(), any(), any(), any());
       inOrder.verify(mockResourceValidator).validate();
     }
   }

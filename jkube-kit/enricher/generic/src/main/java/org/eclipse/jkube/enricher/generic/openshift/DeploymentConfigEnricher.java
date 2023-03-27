@@ -51,6 +51,7 @@ public class DeploymentConfigEnricher extends BaseEnricher {
     public void create(PlatformMode platformMode, KubernetesListBuilder builder) {
         if (isApplicable(platformMode)) {
             for(HasMetadata item : builder.buildItems()) {
+                getContext().getSummaryService().addToEnrichers(getName());
                 if(item instanceof Deployment) {
                     DeploymentConfig deploymentConfig = convertFromAppsV1Deployment(item);
                     removeItemFromKubernetesBuilder(builder, item);

@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.eclipse.jkube.kit.common.KitLogger;
 import org.eclipse.jkube.kit.common.ResourceFileType;
+import org.eclipse.jkube.kit.common.service.SummaryService;
 import org.eclipse.jkube.kit.common.util.JKubeProjectUtil;
 import org.eclipse.jkube.kit.common.util.ResourceClassifier;
 import org.eclipse.jkube.kit.common.util.ValidationUtil;
@@ -62,18 +63,19 @@ public class DefaultResourceService implements ResourceService {
   }
 
   @Override
-  public File writeResources(KubernetesList resources, ResourceClassifier classifier, KitLogger log) throws IOException {
+  public File writeResources(KubernetesList resources, ResourceClassifier classifier, KitLogger log, SummaryService summaryService) throws IOException {
     final File targetDir = resourceServiceConfig.getTargetDir();
     final ResourceFileType resourceFileType = resourceServiceConfig.getResourceFileType();
     // write kubernetes.yml / openshift.yml
     File resourceFileBase = new File(targetDir, classifier.getValue());
 
-    File file = writeResourcesIndividualAndComposite(resources, resourceFileBase, resourceFileType, log);
+    File file = writeResourcesIndividualAndComposite(resources, resourceFileBase, resourceFileType, log, summaryService);
     // Resolve template placeholders
     if (resourceServiceConfig.isInterpolateTemplateParameters()) {
       interpolateTemplateVariables(resources, file);
     }
 
+    summaryService.setAggregateResourceFile(file);
     return file;
   }
 

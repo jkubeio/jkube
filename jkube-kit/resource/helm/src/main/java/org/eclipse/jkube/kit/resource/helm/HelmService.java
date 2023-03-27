@@ -34,6 +34,7 @@ import org.eclipse.jkube.kit.common.RegistryServerConfiguration;
 import org.eclipse.jkube.kit.common.ResourceFileType;
 import org.eclipse.jkube.kit.common.archive.ArchiveCompression;
 import org.eclipse.jkube.kit.common.archive.JKubeTarArchiver;
+import org.eclipse.jkube.kit.common.service.SummaryService;
 import org.eclipse.jkube.kit.common.util.FileUtil;
 import org.eclipse.jkube.kit.common.util.KubernetesHelper;
 import org.eclipse.jkube.kit.common.util.ResourceUtil;
@@ -65,10 +66,12 @@ public class HelmService {
 
   private final JKubeConfiguration jKubeConfiguration;
   private final KitLogger logger;
+  private final SummaryService summaryService;
 
-  public HelmService(JKubeConfiguration jKubeConfiguration, KitLogger logger) {
+  public HelmService(JKubeConfiguration jKubeConfiguration, KitLogger logger, SummaryService summaryService) {
     this.jKubeConfiguration = jKubeConfiguration;
     this.logger = logger;
+    this.summaryService = summaryService;
   }
 
   /**
@@ -107,9 +110,12 @@ public class HelmService {
       logger.debug("Creating Helm configuration Tarball: '%s'", tarballFile.getAbsolutePath());
       final Consumer<TarArchiveEntry> prependNameAsDirectory = tae ->
           tae.setName(String.format("%s/%s", helmConfig.getChart(), tae.getName()));
-      JKubeTarArchiver.createTarBall(
+      summaryService.setHelmChartName(helmConfig.getChart());
+      summaryService.setHelmChartLocation(outputDir);
+      File helmTarball = JKubeTarArchiver.createTarBall(
           tarballFile, outputDir, FileUtil.listFilesAndDirsRecursivelyInDirectory(outputDir), Collections.emptyMap(),
           ArchiveCompression.fromFileName(tarballFile.getName()), null, prependNameAsDirectory);
+      summaryService.setHelmChartCompressedLocation(helmTarball);
       Optional.ofNullable(helmConfig.getGeneratedChartListeners()).orElse(Collections.emptyList())
           .forEach(listener -> listener.chartFileGenerated(helmConfig, helmType, tarballFile));
     }
@@ -137,6 +143,7 @@ public class HelmService {
           .orElse(s -> s);
       setAuthentication(helmRepository, logger, registryServerConfigurations, passwordDecryptor);
       uploadHelmChart(helm, helmRepository);
+      summaryService.setHelmRepository(helmRepository.getName());
     } else {
       String error = "No repository or invalid repository configured for upload";
       logger.error(error);

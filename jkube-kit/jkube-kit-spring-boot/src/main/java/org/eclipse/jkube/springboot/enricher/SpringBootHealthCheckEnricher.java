@@ -86,6 +86,7 @@ public class SpringBootHealthCheckEnricher extends AbstractHealthCheckEnricher {
         try {
             if (getContext().getProjectClassLoaders().isClassInCompileClasspath(true, REQUIRED_CLASSES)) {
                 Properties properties = SpringBootUtil.getSpringBootApplicationProperties(getContext().getProjectClassLoaders().getCompileClassLoader());
+                getContext().getSummaryService().addToEnrichers(getName());
                 return buildProbe(properties, initialDelay, period, timeout, failureTh, successTh);
             }
         } catch (Exception ex) {

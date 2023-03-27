@@ -83,6 +83,7 @@ public class ProjectLabelEnricher extends BaseEnricher {
 
     @Override
     public void create(PlatformMode platformMode, KubernetesListBuilder builder) {
+        getContext().getSummaryService().addToEnrichers(getName());
         builder.accept(new TypedVisitor<ServiceBuilder>() {
             @Override
             public void visit(ServiceBuilder serviceBuilder) {

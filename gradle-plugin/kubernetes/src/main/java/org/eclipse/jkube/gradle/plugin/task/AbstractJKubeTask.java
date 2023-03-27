@@ -48,6 +48,7 @@ import org.gradle.api.tasks.TaskAction;
 import static org.eclipse.jkube.kit.build.service.docker.helper.ConfigHelper.initImageConfiguration;
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestamp;
 import static org.eclipse.jkube.kit.config.service.kubernetes.KubernetesClientUtil.updateResourceConfigNamespace;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.printSummaryIfLastExecuting;
 
 public abstract class AbstractJKubeTask extends DefaultTask implements KubernetesJKubeTask {
 
@@ -66,12 +67,16 @@ public abstract class AbstractJKubeTask extends DefaultTask implements Kubernete
 
   @TaskAction
   public final void runTask() {
-    init();
-    if (shouldSkip()) {
+    try {
+      init();
+      if (shouldSkip()) {
         kitLogger.info("`%s` task is skipped.", this.getName());
         return;
+      }
+      run();
+    } finally {
+      printSummaryIfLastExecuting(jKubeServiceHub, getName(), GradleUtil.getLastExecutingTask(getProject(), getTaskPrioritiesMap()));
     }
-    run();
   }
 
   private void init() {
@@ -83,6 +88,9 @@ public abstract class AbstractJKubeTask extends DefaultTask implements Kubernete
     jKubeServiceHub = initJKubeServiceHubBuilder().build();
     kubernetesExtension.resources = updateResourceConfigNamespace(kubernetesExtension.getNamespaceOrNull(), kubernetesExtension.resources);
     ImageConfigResolver imageConfigResolver = new ImageConfigResolver();
+    jKubeServiceHub.getSummaryService().setSuccessful(true);
+    jKubeServiceHub.getSummaryService().setActionType("Tasks");
+    jKubeServiceHub.getSummaryService().addToActions(getName());
     try {
       resolvedImages = resolveImages(imageConfigResolver);
       final JKubeEnricherContext context = JKubeEnricherContext.builder()
@@ -95,6 +103,7 @@ public abstract class AbstractJKubeTask extends DefaultTask implements Kubernete
           .resources(kubernetesExtension.resources)
           .log(kitLogger)
           .jKubeBuildStrategy(kubernetesExtension.getBuildStrategyOrDefault())
+          .summaryService(jKubeServiceHub.getSummaryService())
           .build();
       final List<String> extraClasspathElements = kubernetesExtension.getUseProjectClassPathOrDefault() ?
           kubernetesExtension.javaProject.getCompileClassPathElements() : Collections.emptyList();
@@ -115,7 +124,7 @@ public abstract class AbstractJKubeTask extends DefaultTask implements Kubernete
   }
 
   private List<ImageConfiguration> customizeConfig(List<ImageConfiguration> configs) {
-    return GeneratorManager.generate(configs, initGeneratorContextBuilder().build(), false);
+    return GeneratorManager.generate(configs, initGeneratorContextBuilder().build(), false, jKubeServiceHub.getSummaryService());
   }
 
   private boolean isAnsiEnabled() {
@@ -145,6 +154,7 @@ public abstract class AbstractJKubeTask extends DefaultTask implements Kubernete
             .build())
         .clusterAccess(clusterAccess)
         .offline(kubernetesExtension.getOfflineOrDefault())
+        .summaryEnabled(kubernetesExtension.getSummaryEnabledOrDefault())
         .platformMode(kubernetesExtension.getRuntimeMode());
   }
 

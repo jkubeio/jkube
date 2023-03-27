@@ -62,7 +62,7 @@ public class OpenShiftBuildServiceUtils {
     final ArchiverCustomizer customizer = createS2IArchiveCustomizer(jKubeServiceHub.getBuildServiceConfig(), imageConfig);
     try {
       return jKubeServiceHub.getDockerServiceHub().getArchiveService()
-          .createDockerBuildArchive(imageConfig, jKubeServiceHub.getConfiguration(), customizer);
+          .createDockerBuildArchive(imageConfig, jKubeServiceHub.getConfiguration(), customizer, jKubeServiceHub.getSummaryService());
     } catch (IOException e) {
       throw new JKubeServiceException("Unable to create the build archive", e);
     }
@@ -123,6 +123,7 @@ public class OpenShiftBuildServiceUtils {
     final String fromNamespace = getMapValueWithDefault(fromExt, JKubeBuildStrategy.SourceStrategy.namespace,
         IMAGE_STREAM_TAG.equals(fromKind) ? "openshift" : null);
     if (osBuildStrategy == JKubeBuildStrategy.docker) {
+      jKubeServiceHub.getSummaryService().setBuildStrategy("Cluster Docker");
       BuildStrategy buildStrategy = new BuildStrategyBuilder()
           .withType("Docker")
           .withNewDockerStrategy()
@@ -141,6 +142,7 @@ public class OpenShiftBuildServiceUtils {
       }
       return buildStrategy;
     } else if (osBuildStrategy == JKubeBuildStrategy.s2i) {
+      jKubeServiceHub.getSummaryService().setBuildStrategy("Cluster S2I");
       BuildStrategy buildStrategy = new BuildStrategyBuilder()
           .withType("Source")
           .withNewSourceStrategy()

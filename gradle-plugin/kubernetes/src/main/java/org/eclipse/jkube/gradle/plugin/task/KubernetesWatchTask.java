@@ -37,6 +37,8 @@ import java.util.List;
 
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestamp;
 import static org.eclipse.jkube.kit.config.service.kubernetes.KubernetesClientUtil.applicableNamespace;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.printSummary;
 
 public class KubernetesWatchTask extends AbstractJKubeTask {
   @Inject
@@ -68,8 +70,11 @@ public class KubernetesWatchTask extends AbstractJKubeTask {
             resources,
             context);
       } catch (KubernetesClientException kubernetesClientException) {
-        KubernetesResourceUtil.handleKubernetesClientException(kubernetesClientException, kitLogger);
+        IllegalStateException illegalStateException = KubernetesResourceUtil.handleKubernetesClientException(kubernetesClientException, kitLogger, jKubeServiceHub.getSummaryService());
+        printSummary(jKubeServiceHub);
+        throw illegalStateException;
       } catch (Exception ioException) {
+        handleExceptionAndSummary(jKubeServiceHub, ioException);
         throw new IllegalStateException("An error has occurred while while trying to watch the resources", ioException);
       }
     }

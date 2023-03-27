@@ -62,6 +62,7 @@ public class ConfigMapEnricher extends BaseEnricher {
                 final Map<String, String> annotations = element.buildMetadata().getAnnotations();
                 if (annotations != null) {
                     try {
+                        getContext().getSummaryService().addToEnrichers(getName());
                         addConfigMapFromAnnotations(annotations, element);
                     } catch (IOException e) {
                         throw new IllegalArgumentException(e);
@@ -111,6 +112,7 @@ public class ConfigMapEnricher extends BaseEnricher {
 
             if ((configMap.getData() != null && !configMap.getData().isEmpty())
                     || (configMap.getBinaryData() != null && !configMap.getBinaryData().isEmpty())) {
+                getContext().getSummaryService().addToEnrichers(getName());
                 builder.addToConfigMapItems(configMap);
             }
         } catch (IOException e) {

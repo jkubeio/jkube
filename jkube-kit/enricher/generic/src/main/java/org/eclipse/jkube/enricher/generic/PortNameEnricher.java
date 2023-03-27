@@ -56,6 +56,7 @@ public class PortNameEnricher extends BaseEnricher {
 
                 // If port is given but no name, then try to detect the name
                 if (port != null && StringUtils.isBlank(portBuilder.getName())) {
+                    getContext().getSummaryService().addToEnrichers(getName());
                     addPortName(portBuilder, port);
                 }
             }

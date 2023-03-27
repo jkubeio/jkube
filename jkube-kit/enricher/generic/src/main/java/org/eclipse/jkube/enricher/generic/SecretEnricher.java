@@ -64,6 +64,7 @@ public abstract class SecretEnricher extends BaseEnricher {
                     }
                     // remove the annotation key
                     annotation.remove(getAnnotationKey());
+                    getContext().getSummaryService().addToEnrichers(getName());
                     secretBuilder.addToData(data);
                 }
             }
@@ -122,6 +123,7 @@ public abstract class SecretEnricher extends BaseEnricher {
 
             Secret secret = new SecretBuilder().withData(data).withMetadata(metadata).withType(type).build();
             if(!secretToIndexMap.containsKey(secretConfig.getName())) {
+                getContext().getSummaryService().addToEnrichers(getName());
                 builder.addToSecretItems(i, secret);
             }
         }

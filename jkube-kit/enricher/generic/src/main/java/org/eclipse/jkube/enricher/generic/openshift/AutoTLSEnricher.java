@@ -80,6 +80,7 @@ public class AutoTLSEnricher extends BaseEnricher {
             return;
         }
 
+        getContext().getSummaryService().addToEnrichers(getName());
         builder.accept(new TypedVisitor<PodTemplateSpecBuilder>() {
             @Override
             public void visit(PodTemplateSpecBuilder builder) {

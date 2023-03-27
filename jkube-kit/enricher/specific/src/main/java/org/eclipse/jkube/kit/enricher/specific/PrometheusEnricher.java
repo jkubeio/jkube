@@ -67,6 +67,7 @@ public class PrometheusEnricher extends BaseEnricher {
                     annotations.put(ANNOTATION_PROMETHEUS_PORT, prometheusPort);
                     annotations.put(ANNOTATION_PROMETHEUS_SCRAPE, "true");
                     annotations.put(ANNOTATION_PROMETHEUS_PATH, getConfig(Config.PROMETHEUS_PATH));
+                    getContext().getSummaryService().addToEnrichers(getName());
                     log.verbose("Adding prometheus.io annotations: %s",
                             annotations.entrySet()
                                     .stream()

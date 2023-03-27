@@ -30,6 +30,7 @@ public class ImagePullPolicyEnricher extends BaseEnricher {
   public void enrich(PlatformMode platformMode, KubernetesListBuilder builder) {
     String imagePullPolicy = getValueFromConfig(JKUBE_ENFORCED_IMAGE_PULL_POLICY, null);
     if (StringUtils.isNotBlank(imagePullPolicy)) {
+      getContext().getSummaryService().addToEnrichers(getName());
       builder.accept(new TypedVisitor<ContainerBuilder>() {
         @Override
         public void visit(ContainerBuilder containerBuilder) {

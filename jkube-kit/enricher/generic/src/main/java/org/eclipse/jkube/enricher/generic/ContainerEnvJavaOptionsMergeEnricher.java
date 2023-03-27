@@ -59,6 +59,7 @@ public class ContainerEnvJavaOptionsMergeEnricher extends BaseEnricher {
   @Override
   public void enrich(PlatformMode platformMode, KubernetesListBuilder builder) {
     if (!asBoolean(getConfig(Config.DISABLE)) && hasImageConfiguration()) {
+      getContext().getSummaryService().addToEnrichers(getName());
       builder.accept(new ContainerEnvJavaOptionsMergeVisitor(getImages()));
     }
   }

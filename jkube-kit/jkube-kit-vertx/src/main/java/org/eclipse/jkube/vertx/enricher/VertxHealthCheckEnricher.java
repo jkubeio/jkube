@@ -127,6 +127,7 @@ public class VertxHealthCheckEnricher extends AbstractHealthCheckEnricher {
         if (!isApplicable()) {
             return null;
         }
+        getContext().getSummaryService().addToEnrichers(getName());
         // We don't allow to set the HOST, because it should rather be configured in the HTTP header (Host header)
         // cf. https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
         String type = getStringValue(Config.TYPE, readiness).orElse("http").toUpperCase();

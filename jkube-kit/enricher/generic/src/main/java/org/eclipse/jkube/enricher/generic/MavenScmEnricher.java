@@ -63,6 +63,7 @@ public class MavenScmEnricher extends BaseEnricher {
                 String url = rootProject.getScmUrl();
                 String tag = rootProject.getScmTag();
 
+                getContext().getSummaryService().addToEnrichers(getName());
                 if (StringUtils.isNotEmpty(tag)) {
                     annotations.put(JKubeAnnotations.SCM_TAG.value(useDeprecatedAnnotationPrefix), tag);
                 }

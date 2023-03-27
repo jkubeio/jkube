@@ -85,6 +85,7 @@ public class QuarkusHealthCheckEnricher extends AbstractHealthCheckEnricher {
         if (!getContext().hasDependency(QUARKUS_GROUP_ID, "quarkus-smallrye-health")) {
             return null;
         }
+        getContext().getSummaryService().addToEnrichers(getName());
         return new ProbeBuilder()
             .withNewHttpGet()
               .withNewPort(asInteger(getConfig(Config.PORT)))

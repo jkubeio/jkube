@@ -64,6 +64,7 @@ public class DockerRegistrySecretEnricher extends SecretEnricher {
 
         JsonObject ret = new JsonObject();
         ret.add(dockerId, params);
+        getContext().getSummaryService().addToEnrichers(getName());
         return Collections.singletonMap(
             SecretConstants.DOCKER_DATA_KEY,
             encode(ret.toString()));

@@ -54,6 +54,7 @@ public class RevisionHistoryEnricher extends BaseEnricher {
 
         log.info("Adding revision history limit to %s", maxRevisionHistories);
 
+        getContext().getSummaryService().addToEnrichers(getName());
         builder.accept(new TypedVisitor<io.fabric8.kubernetes.api.model.apps.DeploymentBuilder>() {
             @Override
             public void visit(io.fabric8.kubernetes.api.model.apps.DeploymentBuilder item) {

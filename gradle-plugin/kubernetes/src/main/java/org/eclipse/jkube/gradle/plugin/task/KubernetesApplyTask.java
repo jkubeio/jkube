@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.eclipse.jkube.kit.config.service.kubernetes.KubernetesClientUtil.resolveFallbackNamespace;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.printSummary;
 
 @SuppressWarnings("CdiInjectionPointsInspection")
 public class KubernetesApplyTask extends AbstractJKubeTask {
@@ -62,13 +64,13 @@ public class KubernetesApplyTask extends AbstractJKubeTask {
       kitLogger.info("[[B]]HINT:[[B]] Use the command `%s get pods -w` to watch your pods start up",
           clusterAccess.isOpenShift() ? "oc" : "kubectl");
     } catch (KubernetesClientException e) {
-      KubernetesResourceUtil.handleKubernetesClientException(e, kitLogger);
+      IllegalStateException illegalStateException = KubernetesResourceUtil.handleKubernetesClientException(e, kitLogger, jKubeServiceHub.getSummaryService());
+      printSummary(jKubeServiceHub);
+      throw illegalStateException;
     } catch (IOException ioException) {
       kitLogger.error("Error in loading Kubernetes Manifests ", ioException);
+      handleExceptionAndSummary(jKubeServiceHub, ioException);
       throw new IllegalStateException(ioException);
-    } catch (InterruptedException interruptedException) {
-      Thread.currentThread().interrupt();
-      throw new IllegalStateException(interruptedException.getMessage(), interruptedException);
     }
   }
 
@@ -77,7 +79,7 @@ public class KubernetesApplyTask extends AbstractJKubeTask {
     return super.shouldSkip() || kubernetesExtension.getSkipApplyOrDefault();
   }
 
-  private void applyEntities(String fileName, final Collection<HasMetadata> entities) throws InterruptedException {
+  private void applyEntities(String fileName, final Collection<HasMetadata> entities) {
     KitLogger serviceLogger = createLogger("[[G]][SVC][[G]] [[s]]");
     applyService.applyEntities(fileName, entities, serviceLogger, kubernetesExtension.getServiceUrlWaitTimeSecondsOrDefault());
   }

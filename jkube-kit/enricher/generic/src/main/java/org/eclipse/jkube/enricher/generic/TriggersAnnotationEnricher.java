@@ -146,6 +146,7 @@ public class TriggersAnnotationEnricher extends BaseEnricher {
                             .build();
 
                     trigger.setAdditionalProperty("fieldPath", "spec.template.spec.containers[?(@.name==\"" + containerName + "\")].image");
+                    getContext().getSummaryService().addToEnrichers(getName());
                     triggerList.add(trigger);
                 }
             }

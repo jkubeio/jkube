@@ -59,6 +59,7 @@ public class DockerHealthCheckEnricher extends AbstractHealthCheckEnricher {
     private Probe getProbe(ImageConfiguration image) {
         if (hasHealthCheck(image)) {
             HealthCheckConfiguration health = image.getBuildConfiguration().getHealthCheck();
+            getContext().getSummaryService().addToEnrichers(getName());
             return new ProbeBuilder()
                     .withExec(new ExecAction(health.getCmd().asStrings()))
                     .withTimeoutSeconds(durationSeconds(health.getTimeout()).orElse(null))

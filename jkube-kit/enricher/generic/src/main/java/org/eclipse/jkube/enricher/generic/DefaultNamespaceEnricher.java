@@ -99,6 +99,7 @@ public class DefaultNamespaceEnricher extends BaseEnricher {
 
                 boolean forceModifyNamespace = Boolean.parseBoolean(getConfig(Config.FORCE));
                 if (StringUtils.isBlank(metaBuilder.getNamespace()) || forceModifyNamespace) {
+                    getContext().getSummaryService().addToEnrichers(getName());
                     metaBuilder.withNamespace(getNamespaceName()).build();
                 }
             }
@@ -145,6 +146,7 @@ public class DefaultNamespaceEnricher extends BaseEnricher {
     private void addNamespaceToBuilder(PlatformMode platformMode, String newNamespaceToCreate, KubernetesListBuilder builder, String type) {
         HasMetadata namespaceOrProject = getNamespaceOrProject(platformMode, type, newNamespaceToCreate);
         if (namespaceOrProject != null) {
+            getContext().getSummaryService().addToEnrichers(getName());
             builder.addToItems(namespaceOrProject);
         }
     }

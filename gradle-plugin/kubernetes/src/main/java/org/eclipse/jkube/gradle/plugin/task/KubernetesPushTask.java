@@ -23,6 +23,8 @@ import org.eclipse.jkube.kit.config.service.JKubeServiceHub;
 import javax.inject.Inject;
 import java.util.Collections;
 
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
+
 public class KubernetesPushTask extends AbstractJKubeTask {
   @Inject
   public KubernetesPushTask(Class<? extends KubernetesExtension> extensionClass) {
@@ -44,6 +46,7 @@ public class KubernetesPushTask extends AbstractJKubeTask {
       jKubeServiceHub.getBuildService()
           .push(resolvedImages, kubernetesExtension.getPushRetriesOrDefault(), initRegistryConfig(), kubernetesExtension.getSkipTagOrDefault());
     } catch (JKubeServiceException e) {
+      handleExceptionAndSummary(jKubeServiceHub, e);
       throw new IllegalStateException("Error in pushing image: " + e.getMessage(), e);
     }
   }

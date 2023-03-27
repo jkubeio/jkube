@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
 
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
 import static org.eclipse.jkube.kit.resource.helm.HelmServiceUtil.initHelmConfig;
 
 /**
@@ -65,6 +66,7 @@ public class HelmMojo extends AbstractJKubeMojo {
           .build();
       jkubeServiceHub.getHelmService().generateHelmCharts(helm);
     } catch (IOException exception) {
+      handleExceptionAndSummary(jkubeServiceHub, exception);
       throw new MojoExecutionException(exception.getMessage());
     }
   }

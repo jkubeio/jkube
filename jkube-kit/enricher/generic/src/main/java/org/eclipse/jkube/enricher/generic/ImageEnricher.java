@@ -205,6 +205,7 @@ public class ImageEnricher extends BaseEnricher {
                 if (containers == null) {
                     containers = new ArrayList<>();
                 }
+                getContext().getSummaryService().addToEnrichers(getName());
                 mergeImageConfigurationWithContainerSpec(containers);
                 podSpec.withContainers(containers).endSpec();
             }

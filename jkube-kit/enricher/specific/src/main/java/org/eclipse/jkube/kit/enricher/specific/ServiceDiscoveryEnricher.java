@@ -137,6 +137,7 @@ public class ServiceDiscoveryEnricher extends BaseEnricher {
                 annotations.put(PREFIX + "/" + ANNOTATION_DESCRIPTION_PATH, resolvedDescriptionPath);
             }
             annotations.forEach((key, value) -> log.info("Add %s annotation: \"%s\" : \"%s\"", PREFIX, key, value));
+            getContext().getSummaryService().addToEnrichers(getName());
             serviceBuilder.editMetadata().addToAnnotations(annotations).and().buildMetadata();
         }
     }

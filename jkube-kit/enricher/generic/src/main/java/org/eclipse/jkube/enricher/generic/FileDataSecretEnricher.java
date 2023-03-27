@@ -56,6 +56,7 @@ public class FileDataSecretEnricher extends BaseEnricher {
                 try {
                     if (annotations != null && !annotations.isEmpty()) {
                         final Map<String, String> secretAnnotations = createSecretFromAnnotations(annotations);
+                        getContext().getSummaryService().addToEnrichers(getName());
                         element.addToData(secretAnnotations);
                     }
                 } catch (IOException e) {

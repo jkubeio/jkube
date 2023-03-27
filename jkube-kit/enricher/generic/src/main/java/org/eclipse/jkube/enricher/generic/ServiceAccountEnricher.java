@@ -68,6 +68,7 @@ public class ServiceAccountEnricher extends BaseEnricher {
     private List<ServiceAccount> createServiceAccountFromResourceConfig(ResourceConfig resourceConfig) {
         List<ServiceAccount> serviceAccounts = new ArrayList<>();
         if(resourceConfig != null && resourceConfig.getServiceAccounts() != null && !Boolean.parseBoolean(getConfig(Config.SKIP_CREATE))) {
+            getContext().getSummaryService().addToEnrichers(getName());
             for(ServiceAccountConfig serviceAccountConfig : resourceConfig.getServiceAccounts()) {
                 if(serviceAccountConfig.getName() != null) {
                     serviceAccounts.add(createServiceAccount(serviceAccountConfig.getName()));
@@ -88,6 +89,7 @@ public class ServiceAccountEnricher extends BaseEnricher {
                     serviceAccounts.add(createServiceAccount(serviceAccountName));
                 }
                 if(deploymentToSaPair.containsKey(deploymentBuilder.buildMetadata().getName())) {
+                    getContext().getSummaryService().addToEnrichers(getName());
                     deploymentBuilder.editSpec()
                         .editTemplate()
                         .editSpec()

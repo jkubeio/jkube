@@ -96,6 +96,7 @@ public class VolumePermissionEnricher extends BaseEnricher {
 
                 log.verbose("Adding init container for changing persistent volumes access mode to %s",
                         getConfig(Config.PERMISSION));
+                getContext().getSummaryService().addToEnrichers(getName());
                 if (!KubernetesResourceUtil.hasInitContainer(builder, ENRICHER_NAME)) {
                     KubernetesResourceUtil.appendInitContainer(builder, createPvInitContainer(podSpec), log);
                 }

@@ -81,6 +81,7 @@ public class RouteEnricher extends BaseEnricher implements ServiceExposer {
         }
 
         if(platformMode == PlatformMode.openshift && isGenerateRoute()) {
+            getContext().getSummaryService().addToEnrichers(getName());
             listBuilder.accept(new TypedVisitor<ServiceBuilder>() {
 
                 @Override

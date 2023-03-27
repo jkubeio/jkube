@@ -68,6 +68,7 @@ public class ThorntailV2HealthCheckEnricher extends AbstractHealthCheckEnricher 
 
         if (getContext().hasDependency(IO_THORNTAIL, "monitor")
                 || getContext().hasDependency(IO_THORNTAIL, "microprofile-health")) {
+            getContext().getSummaryService().addToEnrichers(getName());
             Integer port = getPort();
             // scheme must be in upper case in k8s
             String scheme = getScheme().toUpperCase();

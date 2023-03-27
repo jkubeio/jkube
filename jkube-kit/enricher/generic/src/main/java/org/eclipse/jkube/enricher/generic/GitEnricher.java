@@ -65,6 +65,7 @@ public class GitEnricher extends BaseEnricher {
                         log.warn("Could not detect any git remote");
                     }
 
+                    getContext().getSummaryService().addToEnrichers(getName());
                     annotations.putAll(getAnnotations(platformMode, gitRemoteUrl, repository.getBranch(), GitUtil.getGitCommitId(repository), useDeprecatedAnnotationPrefix));
                 }
                 return annotations;

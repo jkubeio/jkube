@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
+
 public class KubernetesUndeployTask extends AbstractJKubeTask {
 
   @Inject
@@ -44,6 +46,7 @@ public class KubernetesUndeployTask extends AbstractJKubeTask {
       jKubeServiceHub.getUndeployService()
         .undeploy(environmentResourceDirs, resources, findManifestsToUndeploy().toArray(new File[0]));
     } catch (IOException e) {
+      handleExceptionAndSummary(jKubeServiceHub, e);
       throw new IllegalStateException(e.getMessage(), e);
     }
   }

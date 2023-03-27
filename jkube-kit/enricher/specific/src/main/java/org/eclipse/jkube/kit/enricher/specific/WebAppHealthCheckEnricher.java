@@ -62,6 +62,7 @@ public class WebAppHealthCheckEnricher extends AbstractHealthCheckEnricher {
             return null;
         }
 
+        getContext().getSummaryService().addToEnrichers(getName());
         Integer port = getPort();
         String scheme = getScheme().toUpperCase();
         String path = getPath();

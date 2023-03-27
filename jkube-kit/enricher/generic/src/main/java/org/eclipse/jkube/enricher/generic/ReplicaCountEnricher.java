@@ -34,6 +34,7 @@ public class ReplicaCountEnricher extends BaseEnricher {
   public void enrich(PlatformMode platformMode, KubernetesListBuilder builder) {
     Integer replicas = Configs.asInteger(getValueFromConfig(JKUBE_ENFORCED_REPLICAS, null));
     if (replicas != null) {
+      getContext().getSummaryService().addToEnrichers(getName());
       getContext().getHandlerHub().getControllerHandlers()
           .forEach(controller -> controller.get().overrideReplicas(builder, replicas));
     }

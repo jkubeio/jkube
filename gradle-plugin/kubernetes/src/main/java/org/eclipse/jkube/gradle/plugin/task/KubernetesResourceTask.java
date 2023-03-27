@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import static org.eclipse.jkube.kit.common.util.DekorateUtil.DEFAULT_RESOURCE_LOCATION;
 import static org.eclipse.jkube.kit.common.util.DekorateUtil.useDekorate;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
 import static org.eclipse.jkube.kit.enricher.api.util.KubernetesResourceUtil.updateKindFilenameMappings;
 import static org.eclipse.jkube.kit.common.JKubeFileInterpolator.interpolate;
 
@@ -88,10 +89,11 @@ public class KubernetesResourceTask extends AbstractJKubeTask {
         ResourceClassifier resourceClassifier = kubernetesExtension.getResourceClassifier();
         KubernetesList resourceList =  jKubeServiceHub.getResourceService().generateResources(kubernetesExtension.getPlatformMode(), enricherManager, kitLogger);
         final File resourceClassifierDir = new File(kubernetesExtension.getResourceTargetDirectoryOrDefault(), resourceClassifier.getValue());
-        jKubeServiceHub.getResourceService().writeResources(resourceList, resourceClassifier, kitLogger);
+        jKubeServiceHub.getResourceService().writeResources(resourceList, resourceClassifier, kitLogger, jKubeServiceHub.getSummaryService());
         validateIfRequired(resourceClassifierDir, resourceClassifier);
       }
     } catch (IOException e) {
+      handleExceptionAndSummary(jKubeServiceHub, e);
       throw new IllegalStateException("Failed to generate kubernetes descriptor", e);
     }
   }

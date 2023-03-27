@@ -94,6 +94,7 @@ public class WildflyJARHealthCheckEnricher extends AbstractHealthCheckEnricher {
 
     private Probe discoverWildflyJARHealthCheck(Config path, Config initialDelay) {
         if (isAvailable()) {
+            getContext().getSummaryService().addToEnrichers(getName());
             int port = asInt(getConfig(Config.PORT));
             if (port <= 0) {
                 return null;

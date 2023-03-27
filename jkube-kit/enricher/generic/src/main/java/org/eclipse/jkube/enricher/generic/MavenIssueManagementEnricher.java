@@ -120,6 +120,7 @@ public class MavenIssueManagementEnricher extends BaseEnricher {
                 String system = rootProject.getIssueManagementSystem();
                 String url = rootProject.getIssueManagementUrl();
                 if (StringUtils.isNotEmpty(system) && StringUtils.isNotEmpty(url)) {
+                    getContext().getSummaryService().addToEnrichers(getName());
                     annotations.put(JKubeAnnotations.ISSUE_SYSTEM.value(useDeprecatedAnnotationPrefix), system);
                     annotations.put(JKubeAnnotations.ISSUE_TRACKER_URL.value(useDeprecatedAnnotationPrefix), url);
                 }

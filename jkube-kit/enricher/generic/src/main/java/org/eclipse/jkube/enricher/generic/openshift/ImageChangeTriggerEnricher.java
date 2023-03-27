@@ -63,6 +63,7 @@ public class ImageChangeTriggerEnricher extends BaseEnricher {
         if(platformMode.equals(PlatformMode.kubernetes))
             return;
 
+        getContext().getSummaryService().addToEnrichers(getName());
         builder.accept(new TypedVisitor<DeploymentConfigSpecBuilder>() {
             @Override
             public void visit(DeploymentConfigSpecBuilder builder) {

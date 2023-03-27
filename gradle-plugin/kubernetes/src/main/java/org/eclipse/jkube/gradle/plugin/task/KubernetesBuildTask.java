@@ -29,6 +29,7 @@ import java.io.IOException;
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestamp;
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestampFile;
 import static org.eclipse.jkube.kit.common.util.EnvUtil.storeTimestamp;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
 
 @SuppressWarnings("CdiInjectionPointsInspection")
 public class KubernetesBuildTask extends AbstractJKubeTask {
@@ -65,6 +66,7 @@ public class KubernetesBuildTask extends AbstractJKubeTask {
       jKubeServiceHub.getBuildService().build(resolvedImages.toArray(new ImageConfiguration[0]));
     } catch (JKubeServiceException | IOException e) {
       kitLogger.error(e.getMessage());
+      handleExceptionAndSummary(jKubeServiceHub, e);
       throw new GradleException(e.getMessage(), e);
     }
   }

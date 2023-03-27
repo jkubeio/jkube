@@ -151,6 +151,8 @@ public class OpenshiftBuildService extends AbstractImageBuildService {
 
                 // Create a file with generated image streams
                 addImageStreamToFile(getImageStreamFile(), imageName, client);
+                jKubeServiceHub.getSummaryService().setBaseImageNameImageSummary(imageConfig.getName(), imageConfig.getBuildConfiguration().getFrom());
+                jKubeServiceHub.getSummaryService().setImageStreamUsedImageSummary(imageConfig.getName(), resolveImageStreamName(imageName));
 
                 createAdditionalTags(imageConfig, imageName);
             } else {
@@ -206,6 +208,7 @@ public class OpenshiftBuildService extends AbstractImageBuildService {
 
         // Fetch existing build config
         BuildConfig buildConfig = client.buildConfigs().inNamespace(applicableOpenShiftNamespace).withName(buildName).get();
+        jKubeServiceHub.getSummaryService().setOpenShiftBuildConfigName(buildName);
         if (buildConfig != null) {
             // lets verify the BC
             BuildConfigSpec spec = OpenShiftBuildServiceUtils.getBuildConfigSpec(buildConfig);

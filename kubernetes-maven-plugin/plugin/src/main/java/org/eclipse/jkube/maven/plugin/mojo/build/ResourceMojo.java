@@ -63,6 +63,7 @@ import static org.eclipse.jkube.kit.common.ResourceFileType.yaml;
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestamp;
 import static org.eclipse.jkube.kit.common.util.DekorateUtil.DEFAULT_RESOURCE_LOCATION;
 import static org.eclipse.jkube.kit.common.util.DekorateUtil.useDekorate;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
 import static org.eclipse.jkube.kit.enricher.api.util.KubernetesResourceUtil.updateKindFilenameMappings;
 import static org.eclipse.jkube.maven.plugin.mojo.build.BuildMojo.CONTEXT_KEY_BUILD_TIMESTAMP;
 
@@ -213,12 +214,13 @@ public class ResourceMojo extends AbstractJKubeMojo {
                 final ResourceClassifier resourceClassifier = getResourceClassifier();
                 final KubernetesList resourceList = generateResources();
                 final File resourceClassifierDir = new File(this.targetDir, resourceClassifier.getValue());
-                final File artifact = jkubeServiceHub.getResourceService().writeResources(resourceList, resourceClassifier, log);
+                final File artifact = jkubeServiceHub.getResourceService().writeResources(resourceList, resourceClassifier, log, jkubeServiceHub.getSummaryService());
                 validateIfRequired(resourceClassifierDir, resourceClassifier);
                 // Attach it to the Maven reactor so that it will also get deployed
                 projectHelper.attachArtifact(project, this.resourceFileType.getArtifactType(), resourceClassifier.getValue(), artifact);
             }
         } catch (IOException e) {
+            handleExceptionAndSummary(jkubeServiceHub, e);
             throw new MojoExecutionException("Failed to generate kubernetes descriptor", e);
         }
     }
@@ -302,6 +304,7 @@ public class ResourceMojo extends AbstractJKubeMojo {
                 .settings(MavenUtil.getRegistryServerFromMavenSettings(settings))
                 .resources(resources)
                 .images(resolvedImages)
+                .summaryService(jkubeServiceHub.getSummaryService())
                 .log(log);
 
         DefaultEnricherManager enricherManager = new DefaultEnricherManager(ctxBuilder.build(),
@@ -339,7 +342,7 @@ public class ResourceMojo extends AbstractJKubeMojo {
                   .strategy(JKubeBuildStrategy.docker)
                   .useProjectClasspath(useProjectClasspath)
                   .build();
-              return GeneratorManager.generate(configs, ctx, true);
+              return GeneratorManager.generate(configs, ctx, true, jkubeServiceHub.getSummaryService());
             } catch (Exception e) {
               throw new IllegalArgumentException("Cannot extract generator: " + e, e);
             }

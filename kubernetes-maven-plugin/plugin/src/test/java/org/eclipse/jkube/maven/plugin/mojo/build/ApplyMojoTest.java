@@ -18,10 +18,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Properties;
 
 import io.fabric8.openshift.client.NamespacedOpenShiftClient;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.jkube.kit.common.KitLogger;
+import org.eclipse.jkube.kit.common.service.SummaryService;
 import org.eclipse.jkube.kit.config.access.ClusterAccess;
 import org.eclipse.jkube.kit.config.resource.ResourceConfig;
 import org.eclipse.jkube.kit.config.service.ApplyService;
@@ -51,6 +55,8 @@ class ApplyMojoTest {
   private MockedConstruction<ClusterAccess> clusterAccessMockedConstruction;
   private File kubernetesManifestFile;
   private MavenProject mavenProject;
+  private MavenSession mavenSession;
+  private MojoExecution mockedMojoExecution;
   private NamespacedOpenShiftClient defaultKubernetesClient;
   private String kubeConfigNamespace;
 
@@ -58,23 +64,30 @@ class ApplyMojoTest {
 
   @BeforeEach
   void setUp(@TempDir Path temporaryFolder) throws IOException {
+    SummaryService summaryService = mock(SummaryService.class);
     jKubeServiceHubMockedConstruction = mockConstruction(JKubeServiceHub.class,
         withSettings().defaultAnswer(RETURNS_DEEP_STUBS), (mock, context) -> {
           when(mock.getClient()).thenReturn(defaultKubernetesClient);
           when(mock.getClusterAccess().createDefaultClient()).thenReturn(defaultKubernetesClient);
-          when(mock.getApplyService()).thenReturn(new ApplyService(defaultKubernetesClient, new KitLogger.SilentLogger()));
+          when(mock.getApplyService()).thenReturn(new ApplyService(defaultKubernetesClient, new KitLogger.SilentLogger(), summaryService));
         });
     clusterAccessMockedConstruction = mockConstruction(ClusterAccess.class, (mock, context) ->
         when(mock.getNamespace()).thenAnswer(invocation -> kubeConfigNamespace));
     kubernetesManifestFile = Files.createFile(temporaryFolder.resolve("kubernetes.yml")).toFile();
     mavenProject = mock(MavenProject.class);
+    mavenSession = mock(MavenSession.class);
+    mockedMojoExecution = mock(MojoExecution.class);
     when(mavenProject.getProperties()).thenReturn(new Properties());
+    when(mavenSession.getGoals()).thenReturn(Collections.singletonList("k8s:apply"));
+    when(mockedMojoExecution.getGoal()).thenReturn("k8s:apply");
     defaultKubernetesClient = mock(NamespacedOpenShiftClient.class);
     when(defaultKubernetesClient.adapt(any())).thenReturn(defaultKubernetesClient);
     when(defaultKubernetesClient.getMasterUrl()).thenReturn(URI.create("https://www.example.com").toURL());
     // @formatter:off
     applyMojo = new ApplyMojo() {{
         project = mavenProject;
+        session = mavenSession;
+        mojoExecution = mockedMojoExecution;
         settings = mock(Settings.class);
         kubernetesManifest = kubernetesManifestFile;
     }};

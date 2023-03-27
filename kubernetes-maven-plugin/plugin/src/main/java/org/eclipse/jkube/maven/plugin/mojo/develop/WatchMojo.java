@@ -51,6 +51,8 @@ import org.eclipse.jkube.watcher.api.WatcherManager;
 
 import static org.eclipse.jkube.kit.common.util.BuildReferenceDateUtil.getBuildTimestamp;
 import static org.eclipse.jkube.kit.config.service.kubernetes.KubernetesClientUtil.applicableNamespace;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.handleExceptionAndSummary;
+import static org.eclipse.jkube.kit.config.service.kubernetes.SummaryServiceUtil.printSummary;
 import static org.eclipse.jkube.maven.plugin.mojo.build.ApplyMojo.DEFAULT_KUBERNETES_MANIFEST;
 
 
@@ -112,8 +114,11 @@ public class WatchMojo extends AbstractDockerMojo implements ManifestProvider {
                 context);
 
         } catch (KubernetesClientException ex) {
-            KubernetesResourceUtil.handleKubernetesClientException(ex, this.log);
+            IllegalStateException exception = KubernetesResourceUtil.handleKubernetesClientException(ex, this.log, jkubeServiceHub.getSummaryService());
+            printSummary(jkubeServiceHub);
+            throw exception;
         } catch (Exception ex) {
+            handleExceptionAndSummary(jkubeServiceHub, ex);
             throw new MojoExecutionException("An error has occurred while while trying to watch the resources", ex);
         }
     }

@@ -91,6 +91,7 @@ public class KarafHealthCheckEnricher extends AbstractHealthCheckEnricher {
 
                 for (String featureValue : features) {
                     if ("jkube-karaf-checks".equals(featureValue)) {
+                        getContext().getSummaryService().addToEnrichers(getName());
                         return new ProbeBuilder().withNewHttpGet().withNewPort(DEFAULT_HEALTH_CHECK_PORT).withPath(path).endHttpGet()
                                 .withSuccessThreshold(getSuccessThreshold())
                                 .withFailureThreshold(getFailureThreshold())
@@ -101,6 +102,7 @@ public class KarafHealthCheckEnricher extends AbstractHealthCheckEnricher {
 
                 String featureValue = (String) feature;
                 if ("jkube-karaf-checks".equals(featureValue)) {
+                    getContext().getSummaryService().addToEnrichers(getName());
                     return new ProbeBuilder().withNewHttpGet().withNewPort(DEFAULT_HEALTH_CHECK_PORT).withPath(path).endHttpGet()
                             .withSuccessThreshold(getSuccessThreshold())
                             .withFailureThreshold(getFailureThreshold())

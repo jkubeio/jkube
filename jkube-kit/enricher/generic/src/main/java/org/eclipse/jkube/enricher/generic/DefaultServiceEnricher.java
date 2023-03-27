@@ -127,6 +127,7 @@ public class DefaultServiceEnricher extends BaseEnricher {
     public void create(PlatformMode platformMode, KubernetesListBuilder builder) {
 
         final ResourceConfig xmlConfig = getConfiguration().getResource();
+        getContext().getSummaryService().addToEnrichers(getName());
         if (Optional.ofNullable(xmlConfig).map(ResourceConfig::getServices).map(c -> !c.isEmpty()).orElse(false)) {
             // Add Services configured via XML
             addServices(builder, xmlConfig.getServices());

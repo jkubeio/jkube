@@ -47,6 +47,7 @@ public class PodAnnotationEnricher extends BaseEnricher {
                         template.setMetadata(new ObjectMeta());
                     }
                     final ObjectMeta templateMetadata = template.getMetadata();
+                    getContext().getSummaryService().addToEnrichers(getName());
                     templateMetadata.setAnnotations(MapUtil.mergeMaps(templateMetadata.getAnnotations(), item.getMetadata().getAnnotations()));
                 }
             }

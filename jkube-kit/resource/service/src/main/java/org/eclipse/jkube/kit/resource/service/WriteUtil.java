@@ -21,6 +21,7 @@ import io.fabric8.openshift.api.model.Template;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jkube.kit.common.KitLogger;
 import org.eclipse.jkube.kit.common.ResourceFileType;
+import org.eclipse.jkube.kit.common.service.SummaryService;
 import org.eclipse.jkube.kit.common.util.KubernetesHelper;
 import org.eclipse.jkube.kit.common.util.ResourceUtil;
 import org.eclipse.jkube.kit.enricher.api.util.KubernetesResourceUtil;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.eclipse.jkube.kit.resource.service.TemplateUtil.getSingletonTemplate;
 
@@ -39,7 +41,7 @@ class WriteUtil {
   private WriteUtil(){ }
 
   static File writeResourcesIndividualAndComposite(
-      KubernetesList resources, File resourceFileBase, ResourceFileType resourceFileType, KitLogger log) throws IOException {
+      KubernetesList resources, File resourceFileBase, ResourceFileType resourceFileType, KitLogger log, SummaryService summaryService) throws IOException {
 
     resources.getItems().sort(COMPARATOR);
     // entity is object which will be sent to writeResource for openshift.yml
@@ -60,12 +62,12 @@ class WriteUtil {
 
     // write separate files, one for each resource item
     // resources passed to writeIndividualResources is also new one.
-    writeIndividualResources(resources, resourceFileBase, resourceFileType, log);
+    writeIndividualResources(resources, resourceFileBase, resourceFileType, log, summaryService);
     return file;
   }
 
   private static void writeIndividualResources(
-      KubernetesList resources, File targetDir, ResourceFileType resourceFileType, KitLogger log) throws IOException {
+      KubernetesList resources, File targetDir, ResourceFileType resourceFileType, KitLogger log, SummaryService summaryService) throws IOException {
     final Map<String, Integer> generatedFiles = new HashMap<>();
     for (HasMetadata item : resources.getItems()) {
       String name = KubernetesHelper.getName(item);
@@ -81,6 +83,9 @@ class WriteUtil {
 
       // Here we are writing individual file for all the resources.
       File itemTarget = new File(targetDir, fileName);
+      summaryService.addGeneratedResourceFile(Optional.ofNullable(resourceFileType)
+          .map(r -> r.addExtensionIfMissing(itemTarget))
+          .orElse(itemTarget));
       writeResource(itemTarget, item, resourceFileType);
     }
   }

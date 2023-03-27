@@ -81,6 +81,7 @@ public class IngressEnricher extends BaseEnricher implements ServiceExposer {
                     }
                     HasMetadata generatedIngress = generateIngressWithConfiguredApiVersion(serviceBuilder);
                     if (generatedIngress != null) {
+                        getContext().getSummaryService().addToEnrichers(getName());
                         listBuilder.addToItems(generatedIngress);
                     }
                 }
