@@ -105,7 +105,7 @@
     <version.jacoco>0.8.12</version.jacoco>
     <version.json-smart>2.5.1</version.json-smart> <!-- Transitive dependency  required by citrus -->
     <version.junit5>5.11.4</version.junit5>
-    <version.kubernetes-client>6.13.4</version.kubernetes-client>
+    <version.kubernetes-client>6.13.5</version.kubernetes-client>
     <version.license-maven-plugin>4.6</version.license-maven-plugin>
     <version.lombok>1.18.36</version.lombok>
     <version.lombok-maven-plugin>1.18.20.0</version.lombok-maven-plugin>
@@ -127,7 +127,7 @@
     <version.slf4j-api>1.7.36</version.slf4j-api>
     <version.sonar-maven-plugin>3.11.0.3922</version.sonar-maven-plugin>
     <version.sshd>2.14.0</version.sshd>
-    <project.build.outputTimestamp>2025-01-15T11:25:42Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-02-11T12:43:03Z</project.build.outputTimestamp>
     <asciidoctor.outputHtmlDirectory>${project.build.directory}/generated-docs</asciidoctor.outputHtmlDirectory>
   </properties>
 

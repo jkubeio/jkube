@@ -22,6 +22,10 @@ Usage:
 ```
 ### 1.19-SNAPSHOT
 
+### 1.18.1 (2025-02-11)
+* Fix #3642: Config properties resolved for generated images
+* Fix #3660: remote-dev issue with ssh user (locked)
+
 ### 1.18.0 (2025-01-15)
 * Fix #1125: Support WebFlux SpringBoot projects when it comes to generate probes for actuators
 * Fix #2844: `oc:build` on openshift use `pods/log` to retrieve logs from build
